@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:Label text="Samples" class="manager__tab__title" />
+    <ui:Label text="Here you find a variety of samples you can import to learn more about the different aspects of creating a settings menu with the asset. You can also check out some sample menus to get inspired for your own menu(s). If you can think of a sample that would be useful to add to the list please reach out." style="white-space: normal; margin-right: 10px; margin-left: 10px;" />
+    <ui:VisualElement style="flex-grow: 1; margin-left: 10px; margin-right: 10px; margin-top: 10px; margin-bottom: 10px;">
+        <ui:ListView focusable="true" />
+        <ui:VisualElement name="spacer" style="min-height: 10px;" />
+        <ui:Button text="Button" display-tooltip-when-elided="true" class="refresh-bundles-button" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -16,7 +16,9 @@ MonoBehaviour:
   title: HAP Integration
   sections:
   - heading: Undead Horse - Knight
-    text: Unpack the unitypackage after you have downloaded Horse Animset Pro to avoid
-      broken prefabs
+    text: Unpack the unitypackage after you have downloaded Horse Animset Pro to
+      avoid broken prefabs
     linkText: 
     url: 
+    reference: {fileID: 0}
+  packages: []
