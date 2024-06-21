@@ -26,7 +26,12 @@ namespace AquariusMax.Ancient
         bool isStrafingRight = false;
         bool isJumping = false;
         bool isWalkingBack = false;
-        bool isRollingForward = false; // 추가된 변수
+        bool isRollingForward = false;
+        bool isRollingBackward = false;
+        bool isRollingLeft = false;
+        bool isRollingRight = false;
+        bool isAttacking = false;
+        bool isGathering = false; // Gathering 상태를 나타내는 변수
 
         void Start()
         {
@@ -44,9 +49,14 @@ namespace AquariusMax.Ancient
             CameraLook();
             UpdateMovement();
             UpdateJump();
+            UpdateAttack();
+            UpdateGathering(); // 추가된 메서드 호출
             UpdateAnimator();
             CheckWalkingBack();
-            CheckRollingForward(); // 새로운 메서드 호출
+            CheckRollingForward();
+            CheckRollingBackward();
+            CheckRollingLeft();
+            CheckRollingRight();
         }
 
         void FixedUpdate()
@@ -76,7 +86,7 @@ namespace AquariusMax.Ancient
             Vector2 moveInput = new Vector2(horizontal, vertical).normalized;
 
             isRunning = Input.GetKey(KeyCode.LeftShift);
-            isWalking = !isRunning && moveInput.magnitude > 0 && !isStrafingLeft && !isStrafingRight;
+            isWalking = Input.GetKey(KeyCode.W);
             isStrafingLeft = Input.GetKey(KeyCode.A);
             isStrafingRight = Input.GetKey(KeyCode.D);
         }
@@ -86,6 +96,30 @@ namespace AquariusMax.Ancient
             if (isGrounded && Input.GetKeyDown(KeyCode.Space))
             {
                 isJumping = true;
+            }
+        }
+
+        void UpdateAttack()
+        {
+            if (Input.GetMouseButtonDown(0)) // 좌클릭을 누르면
+            {
+                isAttacking = true; // 공격 상태로 설정
+            }
+            else if (Input.GetMouseButtonUp(0)) // 좌클릭을 뗄 때
+            {
+                isAttacking = false; // 공격 상태 해제
+            }
+        }
+
+        void UpdateGathering()
+        {
+            if (Input.GetKeyDown(KeyCode.G))
+            {
+                isGathering = true; // Gathering 상태로 설정
+            }
+            else if (Input.GetKeyUp(KeyCode.G))
+            {
+                isGathering = false; // Gathering 상태 해제
             }
         }
 
@@ -131,7 +165,12 @@ namespace AquariusMax.Ancient
                 animator.SetBool("IsStrafeRight", isStrafingRight);
                 animator.SetBool("IsJump", isJumping);
                 animator.SetBool("IsWalkBack", isWalkingBack);
-                animator.SetBool("IsRollForward", isRollingForward); // rollforward 상태 추가
+                animator.SetBool("IsRollForward", isRollingForward);
+                animator.SetBool("IsRollBackward", isRollingBackward);
+                animator.SetBool("IsRollLeft", isRollingLeft);
+                animator.SetBool("IsRollRight", isRollingRight);
+                animator.SetBool("IsAttack", isAttacking);
+                animator.SetBool("IsGathering", isGathering); // Gathering 상태 설정
             }
         }
 
@@ -142,7 +181,22 @@ namespace AquariusMax.Ancient
 
         void CheckRollingForward()
         {
-            isRollingForward = Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.LeftControl); // w + LeftControl 키 입력에 따라 rollforward 상태 설정
+            isRollingForward = Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.LeftControl);
+        }
+
+        void CheckRollingBackward()
+        {
+            isRollingBackward = Input.GetKey(KeyCode.S) && Input.GetKey(KeyCode.LeftControl);
+        }
+
+        void CheckRollingLeft()
+        {
+            isRollingLeft = Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.LeftControl);
+        }
+
+        void CheckRollingRight()
+        {
+            isRollingRight = Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.LeftControl);
         }
 
         Quaternion ClampRotationAroundXAxis(Quaternion q)
