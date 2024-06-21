@@ -5,7 +5,7 @@ using UnityEngine.AI;
 
 public class Monster : MonoBehaviour
 {
-    public enum CurrentState { idle, trace, attack, dead};
+    public enum CurrentState { idle, trace, attack, dead };
     public CurrentState curState = CurrentState.idle;
 
     private Transform _transform;
@@ -18,8 +18,7 @@ public class Monster : MonoBehaviour
 
     private bool isDead = false;
 
-
-     void Start()
+    void Start()
     {
         _transform = this.gameObject.GetComponent<Transform>();
         playerTransform = GameObject.FindWithTag("Player").GetComponent<Transform>();
@@ -30,7 +29,7 @@ public class Monster : MonoBehaviour
         StartCoroutine(this.CheckStateForAction());
     }
 
-         IEnumerator CheckState()
+    IEnumerator CheckState()
     {
         while (!isDead)
         {
@@ -42,7 +41,7 @@ public class Monster : MonoBehaviour
             {
                 curState = CurrentState.attack;
             }
-            else if(dist <= traceDist)
+            else if (dist <= traceDist)
             {
                 curState = CurrentState.trace;
             }
@@ -53,7 +52,6 @@ public class Monster : MonoBehaviour
         }
     }
 
-    
     IEnumerator CheckStateForAction()
     {
         while (!isDead)
@@ -61,21 +59,25 @@ public class Monster : MonoBehaviour
             switch (curState)
             {
                 case CurrentState.idle:
-                    nvAgent.Stop();
+                    nvAgent.isStopped = true;
                     _animator.SetBool("IsTrace", false);
+                    _animator.SetBool("IsAttack", false);
                     break;
 
                 case CurrentState.trace:
                     nvAgent.destination = playerTransform.position;
-                    nvAgent.Resume();
+                    nvAgent.isStopped = false;
                     _animator.SetBool("IsTrace", true);
+                    _animator.SetBool("IsAttack", false);
                     break;
 
                 case CurrentState.attack:
+                    nvAgent.isStopped = true;
+                    _animator.SetBool("IsTrace", false);
+                    _animator.SetBool("IsAttack", true);
                     break;
             }
             yield return null;
         }
     }
 }
-  
