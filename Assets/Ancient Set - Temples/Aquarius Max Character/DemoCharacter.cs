@@ -1,74 +1,57 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace AquariusMax.Ancient
 {
-    // influenced by Unity
     [RequireComponent(typeof(CharacterController))]
     public class DemoCharacter : MonoBehaviour
     {
-        [SerializeField]
-        Camera cam;
-
-        [SerializeField]
-        float gravityModifier = 2f;
-        [SerializeField]
-        float walkSpeed = 5f;
-        [SerializeField]
-        float runSpeed = 10f;
-        [SerializeField]
-        float jumpSpeed = 10f;
-        [SerializeField]
-        float landingForce = 10f;
-
-        [SerializeField]
-        float mouseXSensitivity = 2f;
-        [SerializeField]
-        float mouseYSensitivity = 2f;
+        [SerializeField] Camera cam;
+        [SerializeField] float gravityModifier = 2f;
+        [SerializeField] float walkSpeed = 5f;
+        [SerializeField] float runSpeed = 10f;
+        [SerializeField] float jumpSpeed = 10f;
+        [SerializeField] float landingForce = 10f;
+        [SerializeField] float mouseXSensitivity = 2f;
+        [SerializeField] float mouseYSensitivity = 2f;
 
         CharacterController charControl;
-
+        Animator animator;
         Quaternion characterTargetRot;
         Quaternion cameraTargetRot;
-
         bool isGrounded = true;
-        bool isWalking = true;
-        Vector2 moveInput = Vector2.zero;
-        Vector3 move = Vector3.zero;
-        bool jumpPressed = false;
+        bool isWalking = false;
+        bool isRunning = false;
+        bool isStrafingLeft = false;
+        bool isStrafingRight = false;
         bool isJumping = false;
-
-        CollisionFlags collisionFlags;
+        bool isWalkingBack = false;
+        bool isRollingForward = false; // 추가된 변수
 
         void Start()
         {
             if (cam == null)
-            {
                 cam = Camera.main;
-            }
 
             charControl = GetComponent<CharacterController>();
-
+            animator = GetComponent<Animator>();
             characterTargetRot = transform.localRotation;
             cameraTargetRot = cam.transform.localRotation;
         }
 
-        void GetMoveInput(out float speed)
+        void Update()
         {
-            float horizontal = Input.GetAxis("Horizontal");
-            float vertical = Input.GetAxis("Vertical");
+            CameraLook();
+            UpdateMovement();
+            UpdateJump();
+            UpdateAnimator();
+            CheckWalkingBack();
+            CheckRollingForward(); // 새로운 메서드 호출
+        }
 
-            moveInput = new Vector2(horizontal, vertical);
-            // normalize input if it exceeds 1 in combined length:
-            if (moveInput.sqrMagnitude > 1)
-            {
-                moveInput.Normalize();
-            }
-
-            isWalking = !Input.GetKey(KeyCode.LeftShift);
-
-            speed = isWalking ? walkSpeed : runSpeed;
+        void FixedUpdate()
+        {
+            ApplyMovement();
         }
 
         void CameraLook()
@@ -85,25 +68,36 @@ namespace AquariusMax.Ancient
             cam.transform.localRotation = cameraTargetRot;
         }
 
-        void Update()
+        void UpdateMovement()
         {
-            CameraLook();
+            float horizontal = Input.GetAxis("Horizontal");
+            float vertical = Input.GetAxis("Vertical");
 
-            jumpPressed = Input.GetKeyDown(KeyCode.Space);
+            Vector2 moveInput = new Vector2(horizontal, vertical).normalized;
 
+            isRunning = Input.GetKey(KeyCode.LeftShift);
+            isWalking = !isRunning && moveInput.magnitude > 0 && !isStrafingLeft && !isStrafingRight;
+            isStrafingLeft = Input.GetKey(KeyCode.A);
+            isStrafingRight = Input.GetKey(KeyCode.D);
         }
 
-        private void FixedUpdate()
+        void UpdateJump()
         {
-            float speed;
-            GetMoveInput(out speed);
-            // always move along the camera forward as it is the direction that it being aimed at
-            Vector3 desiredMove = transform.forward * moveInput.y + transform.right * moveInput.x;
+            if (isGrounded && Input.GetKeyDown(KeyCode.Space))
+            {
+                isJumping = true;
+            }
+        }
 
-            // get a normal for the surface that is being touched to move along it
+        void ApplyMovement()
+        {
+            float speed = isRunning ? runSpeed : walkSpeed;
+
+            Vector3 move = Vector3.zero;
+            Vector3 desiredMove = transform.forward * Input.GetAxis("Vertical") + transform.right * Input.GetAxis("Horizontal");
+
             RaycastHit hitInfo;
-            Physics.SphereCast(transform.position, charControl.radius, Vector3.down, out hitInfo,
-                               charControl.height / 2f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+            Physics.SphereCast(transform.position, charControl.radius, Vector3.down, out hitInfo, charControl.height / 2f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
             desiredMove = Vector3.ProjectOnPlane(desiredMove, hitInfo.normal).normalized;
 
             move.x = desiredMove.x * speed;
@@ -113,18 +107,42 @@ namespace AquariusMax.Ancient
             {
                 move.y = -landingForce;
 
-                if (jumpPressed)
+                if (isJumping)
                 {
                     move.y = jumpSpeed;
-                    jumpPressed = false;
-                    isJumping = true;
+                    isJumping = false;
                 }
             }
             else
             {
                 move += Physics.gravity * gravityModifier * Time.fixedDeltaTime;
             }
-            collisionFlags = charControl.Move(move * Time.fixedDeltaTime);
+
+            charControl.Move(move * Time.fixedDeltaTime);
+        }
+
+        void UpdateAnimator()
+        {
+            if (animator != null)
+            {
+                animator.SetBool("IsWalk", isWalking);
+                animator.SetBool("IsRun", isRunning);
+                animator.SetBool("IsStrafeLeft", isStrafingLeft);
+                animator.SetBool("IsStrafeRight", isStrafingRight);
+                animator.SetBool("IsJump", isJumping);
+                animator.SetBool("IsWalkBack", isWalkingBack);
+                animator.SetBool("IsRollForward", isRollingForward); // rollforward 상태 추가
+            }
+        }
+
+        void CheckWalkingBack()
+        {
+            isWalkingBack = Input.GetKey(KeyCode.S);
+        }
+
+        void CheckRollingForward()
+        {
+            isRollingForward = Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.LeftControl); // w + LeftControl 키 입력에 따라 rollforward 상태 설정
         }
 
         Quaternion ClampRotationAroundXAxis(Quaternion q)
@@ -141,22 +159,6 @@ namespace AquariusMax.Ancient
             q.x = Mathf.Tan(0.5f * Mathf.Deg2Rad * angleX);
 
             return q;
-        }
-
-        private void OnControllerColliderHit(ControllerColliderHit hit)
-        {
-            Rigidbody body = hit.collider.attachedRigidbody;
-            //dont move the rigidbody if the character is on top of it
-            if (collisionFlags == CollisionFlags.Below)
-            {
-                return;
-            }
-
-            if (body == null || body.isKinematic)
-            {
-                return;
-            }
-            body.AddForceAtPosition(charControl.velocity * 0.1f, hit.point, ForceMode.Impulse);
         }
     }
 }

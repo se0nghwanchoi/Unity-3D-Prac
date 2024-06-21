@@ -800,6 +800,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Undead Knight
       objectReference: {fileID: 0}
+    - target: {fileID: 4308675244934902506, guid: b8f85fb9e668e0f43913f804f4f52a0f, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 8611d521d3bec2e42bed1d018f8fa584, type: 2}
     - target: {fileID: 8941936108957595949, guid: b8f85fb9e668e0f43913f804f4f52a0f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
