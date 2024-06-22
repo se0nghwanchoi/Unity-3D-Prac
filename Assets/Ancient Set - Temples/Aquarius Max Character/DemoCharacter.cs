@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace AquariusMax.Ancient
 {
@@ -14,6 +15,8 @@ namespace AquariusMax.Ancient
         [SerializeField] float landingForce = 10f;
         [SerializeField] float mouseXSensitivity = 2f;
         [SerializeField] float mouseYSensitivity = 2f;
+
+        [SerializeField] Image healthBar; // 체력바 이미지 추가
 
         CharacterController charControl;
         Animator animator;
@@ -33,6 +36,13 @@ namespace AquariusMax.Ancient
         bool isAttacking = false;
         bool isGathering = false; // Gathering 상태를 나타내는 변수
 
+        public int hp = 20;
+        public int attackPower = 1; // 플레이어의 공격력 변수
+        bool isHit = false;
+        private int deathCount = 0;
+
+        private cshAttackArea m_attackArea = null;
+
         void Start()
         {
             if (cam == null)
@@ -42,6 +52,7 @@ namespace AquariusMax.Ancient
             animator = GetComponent<Animator>();
             characterTargetRot = transform.localRotation;
             cameraTargetRot = cam.transform.localRotation;
+            m_attackArea = GetComponentInChildren<cshAttackArea>();
         }
 
         void Update()
@@ -103,7 +114,37 @@ namespace AquariusMax.Ancient
         {
             if (Input.GetMouseButtonDown(0)) // 좌클릭을 누르면
             {
+                if (this == null) { return; }
+
                 isAttacking = true; // 공격 상태로 설정
+
+                Vector3 center = Vector3.zero;
+                int cnt = m_attackArea.colliders.Count;
+
+                int cntBreak = 0;
+
+                for (int i = 0; i < m_attackArea.colliders.Count; ++i)
+                {
+                    var collider = m_attackArea.colliders[i];
+                    center += collider.transform.localPosition;
+
+                    var enemy = collider.GetComponent<Monster>();
+                    if (enemy != null)
+                    {
+                        enemy.TakeDamage(attackPower); // 공격력을 사용하여 데미지를 줌
+                        if (enemy.GetHP() <= 0) m_attackArea.colliders.Clear();
+                    }
+                    else
+                    {
+                        Destroy(collider.gameObject);
+                    }
+                }
+                if (cntBreak > 0) m_attackArea.colliders.Clear();
+
+                center /= cnt;
+                center.y = transform.localPosition.y;
+                transform.LookAt(center);
+
             }
             else if (Input.GetMouseButtonUp(0)) // 좌클릭을 뗄 때
             {
@@ -153,6 +194,57 @@ namespace AquariusMax.Ancient
             }
 
             charControl.Move(move * Time.fixedDeltaTime);
+        }
+
+        public void TakeDamage()
+        {
+            hp--; // 데미지를 받아 체력을 감소시킴
+            isHit = true; // 공격을 받았음을 표시
+            Debug.Log("피해를 받음");
+            animator.SetTrigger("IsHit"); // 공격 받음 애니메이션 트리거
+
+            // 체력바 업데이트
+            if (healthBar != null)
+            {
+                healthBar.fillAmount = (float)hp / 20; // 현재 체력에 따라 체력바 fillAmount 설정
+            }
+
+            if (hp <= 0)
+            {
+                Reborn();
+            }
+        }
+
+        public int GetHP()
+        {
+            return hp;
+        }
+
+        void Reborn()
+        {
+            deathCount++; // 죽은 횟수를 증가시킴
+
+            if (deathCount == 1)
+            {
+                hp = 16;
+            }
+            else if (deathCount == 2)
+            {
+                hp = 12;
+            }
+            else // deathCount가 2보다 큰 경우
+            {
+                hp = 8;
+            }
+
+            animator.SetTrigger("Reborn"); // 죽음 애니메이션 트리거
+
+            // 체력바 업데이트
+            if (healthBar != null)
+            {
+                healthBar.fillAmount = (float)hp / 20; // 현재 체력에 따라 체력바 fillAmount 설정
+            }
+
         }
 
         void UpdateAnimator()

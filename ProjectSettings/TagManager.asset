@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Animal
   - Knight
+  - Enemy
+  - mwp
+  - attackarea
   layers:
   - Default
   - TransparentFX

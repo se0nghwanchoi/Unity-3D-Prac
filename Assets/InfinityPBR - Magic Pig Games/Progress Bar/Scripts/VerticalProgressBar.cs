@@ -25,5 +25,6 @@ namespace MagicPigGames {
             overlayBar.anchorMin = new Vector2(0, 1); // Anchor to top left corner
             overlayBar.anchorMax = new Vector2(1, 1); // Stretch horizontally
         }
+       
     }
 }
