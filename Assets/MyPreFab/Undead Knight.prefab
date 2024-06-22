@@ -1094,6 +1094,7 @@ MonoBehaviour:
   landingForce: 10
   mouseXSensitivity: 2
   mouseYSensitivity: 2
+  healthBar: {fileID: 1337552949682257982}
   hp: 20
   attackPower: 1
 --- !u!54 &5085760197136533330
@@ -2521,6 +2522,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Canvas
       objectReference: {fileID: 0}
+    - target: {fileID: 963505337771390255, guid: 66a3512d4d6097d48a4d53845b1fb849, type: 3}
+      propertyPath: m_PixelPerfect
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2996825936860568075, guid: 66a3512d4d6097d48a4d53845b1fb849, type: 3}
       propertyPath: progress
       value: 1
@@ -2605,11 +2610,34 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5669289085769202367, guid: 66a3512d4d6097d48a4d53845b1fb849, type: 3}
+      propertyPath: m_Type
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5669289085769202367, guid: 66a3512d4d6097d48a4d53845b1fb849, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: e2a6177f0286d4618b4a1ab93bb8c958, type: 3}
+    - target: {fileID: 5669289085769202367, guid: 66a3512d4d6097d48a4d53845b1fb849, type: 3}
+      propertyPath: m_FillMethod
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 66a3512d4d6097d48a4d53845b1fb849, type: 3}
+--- !u!114 &1337552949682257982 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5669289085769202367, guid: 66a3512d4d6097d48a4d53845b1fb849, type: 3}
+  m_PrefabInstance: {fileID: 6639059225929841281}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &7064274663080564970 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4479943978646921835, guid: 66a3512d4d6097d48a4d53845b1fb849, type: 3}

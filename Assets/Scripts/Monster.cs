@@ -35,6 +35,7 @@ public class Monster : MonoBehaviour
 
         StartCoroutine(this.CheckState());
         StartCoroutine(this.CheckStateForAction());
+
     }
 
     void Update()

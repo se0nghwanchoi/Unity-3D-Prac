@@ -4,33 +4,46 @@ using UnityEngine;
 
 public class test2 : StateMachineBehaviour
 {
+    private int atcpower = 1;
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
-    //override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    //{
-    //    
-    //}
+    override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    {
+        // animator.gameObject는 현재 애니메이터가 연결된 GameObject를 가져옵니다.
+        // 그리고 그 하위의 자식들을 검색할 수 있습니다.
+        foreach (Transform child in animator.gameObject.transform)
+        {
+            // 자식 객체 중에서 attackarea를 찾아서 그 트리거 이벤트를 검사할 수 있습니다.
+            if (child.CompareTag("attackarea"))
+            {
+                // attackarea에 Collider 컴포넌트가 있는지 확인합니다.
+                Collider attackCollider = child.GetComponent<Collider>();
+                if (attackCollider != null && attackCollider.isTrigger)
+                {
+                    // attackarea와 충돌하는 모든 Collider를 배열로 가져옵니다.
+                    Collider[] colliders = Physics.OverlapBox(attackCollider.bounds.center, attackCollider.bounds.extents, Quaternion.identity);
 
-    // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
-    //override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    //{
-    //    
-    //}
+                    foreach (Collider collider in colliders)
+                    {
+                        
+                        if (collider.CompareTag("Enemy"))
+                        {
+                            // player 태그를 가진 객체의 스크립트에 접근하여 메서드를 실행할 수 있습니다.
+                            Monster MobScript = collider.GetComponent<Monster>();
+                            if (MobScript != null)
+                            {
+                                // PlayerScript의 특정 메서드를 실행합니다.
+                                MobScript.TakeDamage(atcpower);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
-    //override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    //{
-    //    
-    //}
+    override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    {
 
-    // OnStateMove is called right after Animator.OnAnimatorMove()
-    //override public void OnStateMove(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    //{
-    //    // Implement code that processes and affects root motion
-    //}
-
-    // OnStateIK is called right after Animator.OnAnimatorIK()
-    //override public void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    //{
-    //    // Implement code that sets up animation IK (inverse kinematics)
-    //}
+    }
 }

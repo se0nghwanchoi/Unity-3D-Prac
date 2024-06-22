@@ -136,7 +136,16 @@ namespace AquariusMax.Ancient
                     }
                     else
                     {
-                        Destroy(collider.gameObject);
+                        var dragon = collider.GetComponent<Dragon>();
+                        if (dragon != null)
+                        {
+                            dragon.TakeDamage(attackPower); // 공격력을 사용하여 데미지를 줌
+                            if (dragon.GetHP() <= 0) m_attackArea.colliders.Clear();
+                        }
+                        else
+                        {
+                            Destroy(collider.gameObject);
+                        }
                     }
                 }
                 if (cntBreak > 0) m_attackArea.colliders.Clear();
